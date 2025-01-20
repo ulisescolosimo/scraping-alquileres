@@ -29,10 +29,8 @@ export default function PropertyList() {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold mb-4">Explore Properties</h1>
-
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-4 flex flex-wrap items-center gap-4">
+        <div className="rounded-lg overflow-hidden">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex-grow">
               <div className="relative">
                 <Input

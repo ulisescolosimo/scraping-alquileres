@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Bed, Bath, DollarSign, Home, Ruler } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +22,8 @@ export default function PropertyCard({ property }) {
     return "/placeholder.svg"; // Imagen por defecto
   };
 
-  console.log(property)
+  // Convertir el precio a un número y formatearlo
+  const formattedPrice = parseFloat(property.price_amount).toLocaleString('es-AR');
 
   return (
     <motion.div
@@ -65,7 +64,7 @@ export default function PropertyCard({ property }) {
         <div className="text-center">
           <p className="text-3xl font-bold text-primary flex items-center justify-center">
             {getCurrencySymbol(property.price_currency)}{" "}
-            {property.price_amount.toLocaleString()}
+            {formattedPrice}
           </p>
           {property.expenses_amount > 0 && (
             <p className="text-sm text-gray-500 mt-1">
