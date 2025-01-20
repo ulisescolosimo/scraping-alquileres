@@ -30,6 +30,7 @@ import { Card, CardContent } from "@/components/ui/card";
 export default function PropertyDetail() {
   const [propertyId, setPropertyId] = useState(null); // Mantener el id de la propiedad
   const [property, setProperty] = useState(null); // Mantener los detalles de la propiedad
+  const [loadingDetail, setLoadingDetail] = useState(true); // Nuevo estado para gestionar la carga
   const { loading, error, fetchPropertyById } = useProperties(); // Usar el hook para cargar la propiedad por id
 
   // Obtener el id de la propiedad desde la URL
@@ -41,7 +42,7 @@ export default function PropertyDetail() {
   // Llamar a fetchPropertyById cuando el id de la propiedad cambie
   useEffect(() => {
     if (propertyId) {
-      setProperty(null); // Resetear propiedad antes de hacer la llamada
+      setLoadingDetail(true); // Indicar que estamos cargando
       fetchPropertyById(propertyId)
         .then((data) => {
           if (data) {
@@ -53,12 +54,13 @@ export default function PropertyDetail() {
         .catch((err) => {
           console.error("Error fetching property:", err);
           setProperty(null); // En caso de error, manejar el estado como no encontrado
-        });
+        })
+        .finally(() => setLoadingDetail(false)); // Dejar de mostrar el loading cuando termine
     }
   }, [propertyId]);
 
   // Mostrar Skeleton mientras se carga la propiedad
-  if (loading) return <PropertyDetailSkeleton />;
+  if (loadingDetail) return <PropertyDetailSkeleton />;
 
   // Mostrar mensaje de error si ocurre
   if (error) return <ErrorDisplay message={error} />;
@@ -117,34 +119,33 @@ export default function PropertyDetail() {
         transition={{ duration: 0.5 }}
       >
         <Card className="overflow-hidden">
-        <CardContent className="p-0">
-  <Carousel className="w-full">
-    <CarouselContent>
-      {images.map((foto, index) => (
-        <CarouselItem key={index}>
-          <div className="aspect-video relative">
-            <img
-              src={foto || "/placeholder.svg"}
-              alt={`Property photo ${index + 1}`}
-              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-            />
-            {/* Badge que muestra la imagen del sitio de origen */}
-            <div className="absolute top-2 left-2 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
-              <img
-                className="w-full h-full object-cover"
-                src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
-                alt={property.site}
-              />
-            </div>
-          </div>
-        </CarouselItem>
-      ))}
-    </CarouselContent>
-    <CarouselPrevious />
-    <CarouselNext />
-  </Carousel>
-</CardContent>
-
+          <CardContent className="p-0">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {images.map((foto, index) => (
+                  <CarouselItem key={index}>
+                    <div className="aspect-video relative">
+                      <img
+                        src={foto || "/placeholder.svg"}
+                        alt={`Property photo ${index + 1}`}
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                      />
+                      {/* Badge que muestra la imagen del sitio de origen */}
+                      <div className="absolute top-2 left-2 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
+                        <img
+                          className="w-full h-full object-cover"
+                          src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
+                          alt={property.site}
+                        />
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </CardContent>
         </Card>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -235,7 +236,7 @@ export default function PropertyDetail() {
                   </h3>
                   <div className="space-y-2">
                     <p className="flex items-center">
-                      <Phone size={18} className="mr-2 text-gray-500" />+
+                      <Phone size={18} className="mr-2 text-gray-500" />+{" "}
                       {formattedPhone}
                     </p>
                     <p className="flex items-center">
@@ -288,7 +289,7 @@ function ErrorDisplay({ message }) {
     <div className="container mx-auto p-4 text-center">
       <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
       <p className="text-gray-700">{message}</p>
-      <Link href="/properties" className="mt-4 inline-block">
+      <Link href="/properties" className="mt-4 inline-bloack">
         <Button variant="outline">Back to Listings</Button>
       </Link>
     </div>
