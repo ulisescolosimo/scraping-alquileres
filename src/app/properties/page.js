@@ -11,11 +11,11 @@ import { useProperties } from "../hooks/useProperties"
 import PropertyCard from "../components/PropertyCard"
 
 export default function PropertyList() {
-  const { properties, loading, error } = useProperties()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterSite, setFilterSite] = useState("all")
-  const [priceRange, setPriceRange] = useState([0, 1000000])
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false)
+  const { properties, loading, error, nextPage, prevPage, page, totalPages } = useProperties();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterSite, setFilterSite] = useState("all");
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
   const filteredProperties = properties.filter((property) => {
     return (
@@ -23,8 +23,8 @@ export default function PropertyList() {
       (filterSite === "all" || property.site === filterSite) &&
       property.price_amount >= priceRange[0] &&
       property.price_amount <= priceRange[1]
-    )
-  })
+    );
+  });
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -117,8 +117,20 @@ export default function PropertyList() {
           )}
         </motion.div>
       )}
+
+      <div className="flex justify-center gap-5 items-center mt-6">
+        <Button onClick={prevPage} disabled={page === 1}>
+          Previous
+        </Button>
+        <p className="text-center">
+          Page {page} of {totalPages}
+        </p>
+        <Button onClick={nextPage} disabled={page === totalPages}>
+          Next
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
 
 function PropertyListSkeleton() {
