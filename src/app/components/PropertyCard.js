@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Bed, Bath, DollarSign, Home, Ruler } from "lucide-react";
 import Link from "next/link";
@@ -27,13 +29,13 @@ export default function PropertyCard({ property }) {
 
   return (
     <motion.div
-      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <img
           className="w-full h-64 object-cover"
           src={property.fotos[0] || "/placeholder.svg"}
@@ -48,12 +50,13 @@ export default function PropertyCard({ property }) {
           />
         </div>
       </div>
-      <div className="p-6 space-y-4">
+
+      <div className="p-6 flex flex-col flex-grow">
         <h2 className="font-bold text-xl mb-2 line-clamp-1">{property.title}</h2>
         <p className="text-gray-600 text-sm line-clamp-2">{property.description || "Description not available"}</p>
-        
+
         {/* Dirección */}
-        <div className="flex items-center justify-between space-x-2">
+        <div className="flex items-center justify-between space-x-2 mt-2">
           <div className="flex items-center space-x-2">
             <Home className="text-gray-400" size={20} />
             <span className="text-gray-600 text-sm">{property.address}</span>
@@ -61,7 +64,7 @@ export default function PropertyCard({ property }) {
         </div>
 
         {/* Precio */}
-        <div className="text-center">
+        <div className="text-center mt-4">
           <p className="text-3xl font-bold text-primary flex items-center justify-center">
             {getCurrencySymbol(property.price_currency)}{" "}
             {formattedPrice}
@@ -74,7 +77,7 @@ export default function PropertyCard({ property }) {
         </div>
 
         {/* Detalles adicionales */}
-        <div className="flex justify-between text-sm text-gray-600">
+        <div className="flex justify-between text-sm text-gray-600 mt-4">
           <div className="flex items-center space-x-1">
             <Bed size={16} />
             <span>{property.dormitorios} Beds</span>
@@ -90,13 +93,15 @@ export default function PropertyCard({ property }) {
         </div>
 
         {/* Antigüedad */}
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 mt-2">
           <span>Antiguedad: {property.antiguedad} years</span>
         </div>
+      </div>
 
-        {/* Botón de ver detalles */}
+      {/* Botón de ver detalles */}
+      <div className="p-6 mt-auto">
         <Link href={`/properties/${property.id}`} passHref>
-          <Button className="w-full mt-4 bg-cyan-800 text-white hover:text-black hover:border-solid-red" variant="default">
+          <Button className="w-full bg-cyan-800 text-white hover:text-black hover:border-solid-red" variant="default">
             View Details
           </Button>
         </Link>
