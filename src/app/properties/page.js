@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation"; // Usamos useRouter para redirigir
 import { useProperties } from "@/app/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,12 +15,23 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bath, Bed, DollarSign, Home, Ruler, Search } from "lucide-react";
+import { supabase } from "../utils/supabaseClient";
 
 export default function PropertyList() {
   const { properties, loading, error, fetchMoreProperties } = useProperties();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const router = useRouter();
+
+  // Verificar si el usuario está logueado
+  useEffect(() => {
+    const user = supabase.auth.getUser();
+    console.log(user)
+    if (!user) {
+      router.push("/login"); // Redirigir al login si no hay usuario autenticado
+    }
+  }, [router]);
 
   const observer = useRef(null);
 
@@ -66,27 +78,26 @@ export default function PropertyList() {
   // Procesa las imágenes y valores numéricos de cada propiedad
   const processedProperties = filteredProperties.map((property) => ({
     ...property,
-    images: processImages(property.images), // Aplica la función processImages a las imágenes
-    // Convierte los valores numéricos antes de mostrarlos
+    images: processImages(property.images),
     dormitorios: parseNumber(property.dormitorios),
     banos: parseNumber(property.banos),
     superficie_total: parseNumber(property.superficie_total),
     superficie_cubierta: parseNumber(property.superficie_cubierta),
     price_amount: parseNumber(property.price_amount),
     expenses_amount: parseNumber(property.expenses_amount),
-    antiguedad: parseNumber(property.antiguedad), // Convierte antiguedad a número
+    antiguedad: parseNumber(property.antiguedad),
   }));
 
   return (
     <div className="container mx-auto p-6 space-y-8">
       <header className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Explore Properties</h1>
+        <h1 className="text-4xl font-bold mb-4 text-gray-800">Explore Properties</h1>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-grow">
             <Input
               type="text"
               placeholder="Search properties..."
-              className="pl-10 pr-4 py-2 w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-4 py-2 w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-yellow-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -95,15 +106,21 @@ export default function PropertyList() {
           <Select
             value={filterType}
             onValueChange={setFilterType}
-            className="w-full sm:w-48 rounded-lg"
+            className="w-full sm:w-48 rounded-xl"
           >
-            <SelectTrigger className="rounded-lg">
+            <SelectTrigger className="rounded-xl">
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="house">House</SelectItem>
-              <SelectItem value="apartment">Apartment</SelectItem>
+            <SelectContent className="bg-white rounded-xl shadow-md">
+              <SelectItem value="all" className="hover:bg-yellow-500">
+                All Types
+              </SelectItem>
+              <SelectItem value="house" className="hover:bg-yellow-500">
+                House
+              </SelectItem>
+              <SelectItem value="apartment" className="hover:bg-yellow-500">
+                Apartment
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -142,7 +159,6 @@ export default function PropertyList() {
 }
 
 function PropertyCard({ property }, ref) {
-  // Función para obtener el símbolo de la moneda basado en price_currency
   const getCurrencySymbol = (currency) => {
     if (currency === "$") {
       return "$"; // Signo de peso argentino
@@ -150,7 +166,6 @@ function PropertyCard({ property }, ref) {
     return "USD"; // Dólar
   };
 
-  // Función para obtener la imagen de la badge según el sitio
   const getSiteBadgeImage = (site) => {
     if (site === "argenprop") {
       return "/images/argenprop.jpg"; // Imagen de Argenprop
@@ -162,30 +177,31 @@ function PropertyCard({ property }, ref) {
 
   return (
     <motion.div
-      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+      className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      ref={ref} // Use the ref passed from the parent to observe
+      ref={ref}
     >
       <div className="relative">
         <img
-          className="w-full h-64 object-cover"
+          className="w-full h-64 object-cover rounded-t-xl"
           src={property.images[0] || "/placeholder.svg"}
           alt={property.title}
         />
         {/* Badge que muestra la imagen del sitio de origen */}
-        <div className="absolute top-0 left-0 m-2 w-10 h-10 rounded-full overflow-hidden">
+        <div className="absolute top-0 left-0 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
           <img
             className="w-full h-full object-cover"
-            src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
+            src={getSiteBadgeImage(property.site)}
             alt={property.site}
           />
         </div>
       </div>
+
       <div className="p-6 space-y-4">
-        <h2 className="font-bold text-xl mb-2 line-clamp-1">{property.title}</h2>
+        <h2 className="font-bold text-xl mb-2 line-clamp-1 text-gray-800">{property.title}</h2>
         <p className="text-gray-600 text-sm line-clamp-2">{property.description || "Description not available"}</p>
         <div className="flex items-center justify-between space-x-2">
           <div className="flex items-center space-x-2">
@@ -222,7 +238,7 @@ function PropertyCard({ property }, ref) {
           <span>Antiguedad: {property.antiguedad} years</span>
         </div>
         <Link href={`/properties/${property.id}`} passHref>
-          <Button className="w-full mt-4 bg-cyan-800 text-white hover:text-black hover:border-solid-red" variant="default">
+          <Button className="w-full mt-4 bg-black text-white hover:bg-yellow-600 rounded-xl transition-colors duration-300">
             View Details
           </Button>
         </Link>
@@ -237,7 +253,7 @@ function PropertyListSkeleton() {
       {[...Array(6)].map((_, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse"
+          className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse"
         >
           {/* Imagen de la propiedad */}
           <div className="w-full h-64 bg-gray-300"></div>
@@ -276,4 +292,3 @@ function PropertyListSkeleton() {
     </div>
   );
 }
-

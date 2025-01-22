@@ -116,43 +116,40 @@ export default function PropertyDetail() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="overflow-hidden">
-        <CardContent className="p-0">
-  <Carousel className="w-full">
-    <CarouselContent>
-      {images.map((foto, index) => (
-        <CarouselItem key={index}>
-          <div className="aspect-video relative">
-            <img
-              src={foto || "/placeholder.svg"}
-              alt={`Property photo ${index + 1}`}
-              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-            />
-            {/* Badge que muestra la imagen del sitio de origen */}
-            <div className="absolute top-2 left-2 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
-              <img
-                className="w-full h-full object-cover"
-                src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
-                alt={property.site}
-              />
-            </div>
-          </div>
-        </CarouselItem>
-      ))}
-    </CarouselContent>
-    <CarouselPrevious />
-    <CarouselNext />
-  </Carousel>
-</CardContent>
-
+        <Card className="overflow-hidden shadow-xl rounded-xl">
+          <CardContent className="p-0">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {images.map((foto, index) => (
+                  <CarouselItem key={index}>
+                    <div className="aspect-video relative">
+                      <img
+                        src={foto || "/placeholder.svg"}
+                        alt={`Property photo ${index + 1}`}
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                      />
+                      {/* Badge que muestra la imagen del sitio de origen */}
+                      <div className="absolute top-2 left-2 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
+                        <img
+                          className="w-full h-full object-cover"
+                          src={getSiteBadgeImage(property.site)}
+                          alt={property.site}
+                        />
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </CardContent>
         </Card>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {property.title}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.title}</h1>
               <div className="flex items-center space-x-2 text-gray-500">
                 <MapPin size={18} />
                 <span>{property.address}</span>
@@ -179,10 +176,7 @@ export default function PropertyDetail() {
                 <TabsTrigger value="description">Description</TabsTrigger>
                 <TabsTrigger value="features">Features</TabsTrigger>
               </TabsList>
-              <TabsContent
-                value="description"
-                className="text-gray-700 leading-relaxed"
-              >
+              <TabsContent value="description" className="text-gray-700 leading-relaxed">
                 {property.description}
               </TabsContent>
               <TabsContent value="features">
@@ -217,8 +211,7 @@ export default function PropertyDetail() {
               <CardContent className="p-6 space-y-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-primary flex items-center justify-center">
-                    {getCurrencySymbol(property.price_currency)}{" "}
-                    {formattedPrice}
+                    {getCurrencySymbol(property.price_currency)} {formattedPrice}
                   </p>
 
                   {expensesAmount > 0 && (
@@ -235,8 +228,7 @@ export default function PropertyDetail() {
                   </h3>
                   <div className="space-y-2">
                     <p className="flex items-center">
-                      <Phone size={18} className="mr-2 text-gray-500" />+
-                      {formattedPhone}
+                      <Phone size={18} className="mr-2 text-gray-500" />+{formattedPhone}
                     </p>
                     <p className="flex items-center">
                       <Mail size={18} className="mr-2 text-gray-500" />
