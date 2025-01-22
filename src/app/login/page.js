@@ -13,18 +13,24 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { user, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      // Si hay un error, mostramos el mensaje de "Credenciales incorrectas"
-      setError("Credenciales incorrectas. Por favor, verifica tu correo y contraseña.");
-    } else {
-      // Si el login es exitoso, redirigimos a la página de propiedades
-      console.log(user);
-      router.push("/properties");
+    
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+  
+      if (error) {
+        // Si hay un error, mostramos el mensaje de "Credenciales incorrectas"
+        setError("Credenciales incorrectas. Por favor, verifica tu correo y contraseña.");
+      } else {
+        // Si el login es exitoso, redirigimos a la página de propiedades
+        console.log(user?.data);  // Aquí ahora deberías ver la información del usuario si todo va bien.
+        router.push("/properties");
+      }
+    } catch (err) {
+      console.error("Error en la autenticación:", err);
+      setError("Hubo un problema al iniciar sesión. Intenta nuevamente.");
     }
   };
 

@@ -12,13 +12,23 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Slider } from "@radix-ui/react-slider"; // Asegúrate de que esté instalado
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  HomeIcon,
+  Bed,
+  Bath,
+  Ruler,
+} from "lucide-react";
 import { supabase } from "../utils/supabaseClient";
 
 export default function PropertyList() {
-  const { properties, loading, error, nextPage, prevPage, page, totalPages } = useProperties();
+  const { properties, loading, error, nextPage, prevPage, page, totalPages } =
+    useProperties();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSite, setFilterSite] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 1000000]);
@@ -28,7 +38,7 @@ export default function PropertyList() {
   // Verificar si el usuario está logueado
   useEffect(() => {
     const user = supabase.auth.getUser();
-    console.log(user)
+    console.log(user);
     if (!user) {
       router.push("/login"); // Redirigir al login si no hay usuario autenticado
     }
@@ -60,7 +70,11 @@ export default function PropertyList() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
             </div>
-            <Select value={filterSite} onValueChange={setFilterSite} className="w-full sm:w-auto bg-white">
+            <Select
+              value={filterSite}
+              onValueChange={setFilterSite}
+              className="w-full sm:w-auto bg-white"
+            >
               <SelectTrigger className="w-full sm:w-40 rounded-full">
                 <SelectValue placeholder="Filter by site" />
               </SelectTrigger>
@@ -96,14 +110,15 @@ export default function PropertyList() {
               >
                 <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price Range
+                    </label>
                     <Slider
+                      value={priceRange}
                       min={0}
                       max={1000000}
                       step={10000}
-                      value={priceRange}
                       onValueChange={setPriceRange}
-                      className="w-full"
                     />
                     <div className="mt-2 text-sm text-gray-600">
                       ${priceRange[0]} - ${priceRange[1]}
@@ -128,9 +143,13 @@ export default function PropertyList() {
           transition={{ duration: 0.5 }}
         >
           {filteredProperties.length === 0 ? (
-            <p className="col-span-full text-center text-gray-500">No properties found.</p>
+            <p className="col-span-full text-center text-gray-500">
+              No properties found.
+            </p>
           ) : (
-            filteredProperties.map((property) => <PropertyCard key={property.id} property={property} />)
+            filteredProperties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))
           )}
         </motion.div>
       )}
@@ -178,7 +197,7 @@ function PropertyCard({ property }) {
       <div className="relative">
         <img
           className="w-full h-64 object-cover rounded-t-xl"
-          src={property.images[0] || "/placeholder.svg"}
+          src={property.fotos[0] || "/placeholder.svg"}
           alt={property.title}
         />
         <div className="absolute top-0 left-0 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
@@ -191,11 +210,15 @@ function PropertyCard({ property }) {
       </div>
 
       <div className="p-6 space-y-4">
-        <h2 className="font-bold text-xl mb-2 line-clamp-1 text-gray-800">{property.title}</h2>
-        <p className="text-gray-600 text-sm line-clamp-2">{property.description || "Description not available"}</p>
+        <h2 className="font-bold text-xl mb-2 line-clamp-1 text-gray-800">
+          {property.title}
+        </h2>
+        <p className="text-gray-600 text-sm line-clamp-2">
+          {property.description || "Description not available"}
+        </p>
         <div className="flex items-center justify-between space-x-2">
           <div className="flex items-center space-x-2">
-            <Home className="text-gray-400" size={20} />
+            <HomeIcon className="text-gray-400" size={20} />
             <span className="text-gray-600 text-sm">{property.address}</span>
           </div>
         </div>
@@ -241,7 +264,10 @@ function PropertyListSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {[...Array(6)].map((_, index) => (
-        <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse">
+        <div
+          key={index}
+          className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse"
+        >
           <div className="w-full h-64 bg-gray-300"></div>
           <div className="p-6 space-y-4">
             <div className="h-6 bg-gray-300 rounded w-3/4"></div>

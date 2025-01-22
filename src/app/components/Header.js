@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { User, LogOut, Home, Search, Menu, X } from "lucide-react"; // Iconos de lucide-react
+import { User, LogOut, HomeIcon, Search, Menu, X } from "lucide-react"; // Iconos de lucide-react
 import { motion } from "framer-motion"; // Librería de animación
 
 export default function Header() {
@@ -14,21 +14,23 @@ export default function Header() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { user } = await supabase.auth.getUser();
-      setUser(user); // Si el usuario está logueado, lo almacenamos
+      const { data: { user }, error } = await supabase.auth.getSession(); // Usamos getSession() para obtener la sesión
+      if (error) {
+        console.error("Error obteniendo sesión:", error.message);
+      }
+      setUser(user || null); // Si el usuario está autenticado, lo almacenamos
     };
 
     checkUser();
 
-    // Escuchar cambios en el estado de autenticación
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
+    // Escuchar cambios de sesión en tiempo real
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null); // Actualiza el estado con el usuario si está autenticado
+    });
 
+    // Limpiar el listener cuando el componente se desmonte
     return () => {
-      authListener?.unsubscribe(); // Limpiar el listener
+      listener?.unsubscribe();
     };
   }, []);
 
@@ -42,8 +44,9 @@ export default function Header() {
     }
   };
 
+
   return (
-    <header className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg z-50 fixed w-full top-0 left-0">
+    <header className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg sticky top-0 left-0 w-full z-50">
       <div className="flex items-center space-x-4">
         <h1 className="text-3xl font-bold text-yellow-400">Alquileres</h1>
       </div>
@@ -59,7 +62,7 @@ export default function Header() {
       <nav className="space-x-6 hidden lg:flex items-center">
         <Link href="/" passHref>
           <button className="btn btn-ghost text-white hover:bg-yellow-600 focus:outline-none flex items-center rounded-xl px-4 py-2">
-            <Home className="mr-2" size={20} /> Home
+            <HomeIcon className="mr-2" size={20} /> Home
           </button>
         </Link>
         <Link href="/properties" passHref>
@@ -68,7 +71,7 @@ export default function Header() {
           </button>
         </Link>
 
-        {!user && (
+        {!user ? (
           <>
             <Link href="/register" passHref>
               <button className="btn btn-ghost text-white hover:bg-yellow-600 focus:outline-none flex items-center rounded-xl px-4 py-2">
@@ -81,9 +84,7 @@ export default function Header() {
               </button>
             </Link>
           </>
-        )}
-
-        {user && (
+        ) : (
           <button
             onClick={handleLogout}
             className="btn btn-ghost text-white hover:bg-red-500 focus:outline-none flex items-center rounded-xl px-4 py-2"
@@ -104,7 +105,7 @@ export default function Header() {
         >
           <Link href="/" passHref>
             <button className="w-full text-left text-white hover:bg-yellow-600 hover:rounded-xl p-2 focus:outline-none flex items-center">
-              <Home className="mr-2" size={20} /> Home
+              <HomeIcon className="mr-2" size={20} /> Home
             </button>
           </Link>
 
@@ -114,7 +115,7 @@ export default function Header() {
             </button>
           </Link>
 
-          {!user && (
+          {!user ? (
             <>
               <Link href="/register" passHref>
                 <button className="w-full text-left text-white hover:bg-yellow-600 hover:rounded-xl p-2 focus:outline-none flex items-center">
@@ -127,9 +128,7 @@ export default function Header() {
                 </button>
               </Link>
             </>
-          )}
-
-          {user && (
+          ) : (
             <button
               onClick={handleLogout}
               className="w-full text-left text-white hover:bg-red-500 focus:outline-none flex items-center"

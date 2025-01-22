@@ -11,7 +11,7 @@ export default function Layout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Alquileres</title>
       </head>
-      <body className="bg-gray-100 text-gray-900 pt-20">
+      <body className="bg-gray-100 text-gray-900">
         <div className="flex flex-col min-h-screen">
           {/* Header */}
           <Header />

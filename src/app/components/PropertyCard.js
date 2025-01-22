@@ -58,7 +58,7 @@ export default function PropertyCard({ property }) {
         {/* Dirección */}
         <div className="flex items-center justify-between space-x-2 mt-2">
           <div className="flex items-center space-x-2">
-            <Home className="text-gray-400" size={20} />
+            <HomeIcon className="text-gray-400" size={20} />
             <span className="text-gray-600 text-sm">{property.address}</span>
           </div>
         </div>

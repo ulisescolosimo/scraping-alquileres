@@ -118,7 +118,6 @@ export default function PropertyDetail() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="overflow-hidden shadow-xl rounded-xl">
         <Card className="overflow-hidden">
           <CardContent className="p-0">
             <Carousel className="w-full">
@@ -136,7 +135,6 @@ export default function PropertyDetail() {
                         <img
                           className="w-full h-full object-cover"
                           src={getSiteBadgeImage(property.site)}
-                          src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
                           alt={property.site}
                         />
                       </div>
