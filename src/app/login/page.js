@@ -25,7 +25,6 @@ export default function Login() {
         setError("Credenciales incorrectas. Por favor, verifica tu correo y contraseña.");
       } else {
         // Si el login es exitoso, redirigimos a la página de propiedades
-        console.log(user?.data);  // Aquí ahora deberías ver la información del usuario si todo va bien.
         router.push("/properties");
       }
     } catch (err) {

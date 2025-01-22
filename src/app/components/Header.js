@@ -37,7 +37,6 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      console.log("Usuario deslogueado");
       router.push("/"); // Redirigir al home después de cerrar sesión
     } catch (error) {
       console.error("Error durante el cierre de sesión:", error.message);

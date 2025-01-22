@@ -15,7 +15,6 @@ export default function Register() {
     // Función asíncrona para obtener el usuario
     const checkUser = async () => {
       const { user, error } = await supabase.auth.getUser();
-      console.log(user);
 
       // Si hay un usuario logueado, redirigir
       if (user) {

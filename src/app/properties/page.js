@@ -38,7 +38,6 @@ export default function PropertyList() {
   // Verificar si el usuario está logueado
   useEffect(() => {
     const user = supabase.auth.getUser();
-    console.log(user);
     if (!user) {
       router.push("/login"); // Redirigir al login si no hay usuario autenticado
     }
