@@ -149,7 +149,9 @@ export default function PropertyDetail() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {property.title}
+              </h1>
               <div className="flex items-center space-x-2 text-gray-500">
                 <MapPin size={18} />
                 <span>{property.address}</span>
@@ -176,7 +178,10 @@ export default function PropertyDetail() {
                 <TabsTrigger value="description">Description</TabsTrigger>
                 <TabsTrigger value="features">Features</TabsTrigger>
               </TabsList>
-              <TabsContent value="description" className="text-gray-700 leading-relaxed">
+              <TabsContent
+                value="description"
+                className="text-gray-700 leading-relaxed"
+              >
                 {property.description}
               </TabsContent>
               <TabsContent value="features">
@@ -211,7 +216,8 @@ export default function PropertyDetail() {
               <CardContent className="p-6 space-y-6">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-primary flex items-center justify-center">
-                    {getCurrencySymbol(property.price_currency)} {formattedPrice}
+                    {getCurrencySymbol(property.price_currency)}{" "}
+                    {formattedPrice}
                   </p>
 
                   {expensesAmount > 0 && (
@@ -228,7 +234,8 @@ export default function PropertyDetail() {
                   </h3>
                   <div className="space-y-2">
                     <p className="flex items-center">
-                      <Phone size={18} className="mr-2 text-gray-500" />+{formattedPhone}
+                      <Phone size={18} className="mr-2 text-gray-500" />+
+                      {formattedPhone}
                     </p>
                     <p className="flex items-center">
                       <Mail size={18} className="mr-2 text-gray-500" />
