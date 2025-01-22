@@ -5,11 +5,30 @@ export const useProperties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Función para cargar las propiedades desde Supabase
-  const fetchProperties = async () => {
+  const fetchProperties = async (page = 1) => {
     try {
-      // Realizar la solicitud para obtener todas las propiedades desde Supabase
+      setLoading(true);
+
+      // Definir la cantidad de propiedades por página
+      const pageSize = 9;
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      // Obtener el total de propiedades (sin paginación)
+      const { count, error: countError } = await supabase
+        .from("properties")
+        .select("id", { count: "exact" });
+
+      if (countError) throw countError;
+
+      setTotalCount(count);
+      setTotalPages(Math.ceil(count / pageSize)); // Calcular el número total de páginas
+
+      // Obtener las propiedades para la página actual
       const { data: propertiesData, error: fetchError } = await supabase
         .from("properties")
         .select(`
@@ -40,17 +59,17 @@ export const useProperties = () => {
           images,
           url,
           scraped_at
-        `);
+        `)
+        .range(from, to);
 
       if (fetchError) throw fetchError;
 
       // Asociar las fotos (si están en el campo images)
       const propertiesWithPhotos = propertiesData.map((property) => {
-        const photos = property.images ? property.images.split("|").filter((url) => url.includes("http")) : [];
-        return {
-          ...property,
-          fotos: photos,  // Aquí se añaden las imágenes procesadas
-        };
+        const photos = property.images
+          ? property.images.split("|").filter((url) => url.includes("http"))
+          : [];
+        return { ...property, fotos: photos };
       });
 
       setProperties(propertiesWithPhotos);
@@ -61,63 +80,17 @@ export const useProperties = () => {
     }
   };
 
-  // Función para cargar una propiedad específica por id
-  const fetchPropertyById = async (id) => {
-    try {
-      const { data: propertyData, error: fetchError } = await supabase
-        .from("properties")
-        .select(`
-          id,
-          title,
-          description,
-          caractextra,
-          site,
-          barrio,
-          tipo_propiedad_id,
-          tipo_propiedad_nombre,
-          publisher_nombre,
-          publisher_telefono,
-          price_amount,
-          price_currency,
-          expenses_amount,
-          expenses_currency,
-          whatsapp,
-          superficie_total,
-          superficie_cubierta,
-          ambientes,
-          dormitorios,
-          banos,
-          antiguedad,
-          latitude,
-          longitude,
-          address,
-          images,
-          url,
-          scraped_at
-        `)
-        .eq("id", id)
-        .single();  // Devuelve solo un objeto (propiedad única)
-
-      if (fetchError) {
-        throw fetchError;
-      }
-
-      const propertyWithPhotos = {
-        ...propertyData,
-        fotos: propertyData.images ? propertyData.images.split("|").filter((url) => url.includes("http")) : [],
-      };
-
-      return propertyWithPhotos;
-    } catch (error) {
-      setError("Error al cargar la propiedad: " + error.message);
-      return null;  // Retornamos null si ocurre un error
-    }
+  const nextPage = () => {
+    if (page < totalPages) setPage(page + 1);
   };
 
-  // Cargar las propiedades al montar el componente
-  useEffect(() => {
-    fetchProperties();
-  }, []); // Solo se ejecuta una vez al montar el componente
+  const prevPage = () => {
+    if (page > 1) setPage(page - 1);
+  };
 
-  return { properties, loading, error, fetchPropertyById };
+  useEffect(() => {
+    fetchProperties(page);
+  }, [page]);
+
+  return { properties, loading, error, nextPage, prevPage, page, totalPages };
 };
