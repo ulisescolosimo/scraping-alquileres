@@ -2,36 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { useProperties } from "@/app/hooks/useProperties"; // Usando tu hook para obtener las propiedades
+import { useProperties } from "@/app/hooks/useProperties"; // Usar el hook para cargar la propiedad por id
 import { motion } from "framer-motion";
-import {
-  Bath,
-  Bed,
-  Home,
-  Phone,
-  Ruler,
-  Mail,
-  DollarSign,
-  Info,
-  MapPin,
-} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Badge, Bath, Bed, Home, Info, Mail, MapPin, Phone, Ruler } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import Link from "next/link";
 
 export default function PropertyDetail() {
   const [propertyId, setPropertyId] = useState(null); // Mantener el id de la propiedad
-  const [property, setProperty] = useState(null); // Mantener los detalles de la propiedad
-  const [loadingDetail, setLoadingDetail] = useState(true); // Nuevo estado para gestionar la carga
-  const { loading, error, fetchPropertyById } = useProperties(); // Usar el hook para cargar la propiedad por id
+  const { property, loading, error, fetchPropertyById, setProperty } = useProperties(); // Usar el hook para cargar la propiedad por id
 
   // Obtener el id de la propiedad desde la URL
   useEffect(() => {
@@ -41,32 +22,34 @@ export default function PropertyDetail() {
 
   // Llamar a fetchPropertyById cuando el id de la propiedad cambie
   useEffect(() => {
-    if (propertyId) {
-      setLoadingDetail(true); // Indicar que estamos cargando
-      fetchPropertyById(propertyId)
-        .then((data) => {
-          if (data) {
-            setProperty(data); // Solo setear si la propiedad es válida
-          } else {
-            setProperty(null); // Si no se encuentra la propiedad, manejar el caso
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching property:", err);
-          setProperty(null); // En caso de error, manejar el estado como no encontrado
-        })
-        .finally(() => setLoadingDetail(false)); // Dejar de mostrar el loading cuando termine
-    }
+    if (!propertyId) return; // Si no hay id de propiedad, no hacer nada
+    const getPropertyDetail = async () => {
+      try {
+        setProperty(null); // Limpiar el estado antes de empezar a cargar
+        const data = await fetchPropertyById(propertyId); // Llamar a la función para obtener la propiedad por ID
+        if (data) {
+          setProperty(data); // Actualizar el estado con la propiedad obtenida
+          console.log(property)
+        } else {
+          setProperty(null); // Si no se encuentra la propiedad, manejar el caso
+        }
+      } catch (err) {
+        console.error("Error fetching property:", err);
+        setProperty(null); // En caso de error, manejar el estado como no encontrado
+      }
+    };
+
+    getPropertyDetail(); // Ejecutar la función
   }, [propertyId]);
 
-  // Mostrar Skeleton mientras se carga la propiedad
-  if (loadingDetail) return <PropertyDetailSkeleton />;
+  // Si la propiedad no está cargada, no mostrar nada hasta que se cargue
+  if (loading || !propertyId) return null;
 
-  // Mostrar mensaje de error si ocurre
-  if (error) return <ErrorDisplay message={error} />;
+  // Mostrar error si ocurre
+  if (error) return <div>Error: {error}</div>;
 
-  // Si no hay propiedad, mostrar "Property not found"
-  if (!property) return <ErrorDisplay message="Property not found" />;
+  // Mostrar un mensaje si no se encuentra la propiedad
+  if (!property) return <div>Property not found</div>;
 
   // Función para convertir valores numéricos correctamente
   const parseNumber = (value) => {
@@ -258,40 +241,6 @@ export default function PropertyDetail() {
           <Button>Schedule a Visit</Button>
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-function PropertyDetailSkeleton() {
-  return (
-    <div className="container mx-auto p-4 space-y-8 animate-pulse">
-      <div className="aspect-video bg-gray-300 rounded-lg"></div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-6">
-          <div className="h-8 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-300 rounded"></div>
-            <div className="h-4 bg-gray-300 rounded"></div>
-            <div className="h-4 bg-gray-300 rounded"></div>
-          </div>
-        </div>
-        <div>
-          <div className="h-40 bg-gray-300 rounded"></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorDisplay({ message }) {
-  return (
-    <div className="container mx-auto p-4 text-center">
-      <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
-      <p className="text-gray-700">{message}</p>
-      <Link href="/properties" className="mt-4 inline-bloack">
-        <Button variant="outline">Back to Listings</Button>
-      </Link>
     </div>
   );
 }

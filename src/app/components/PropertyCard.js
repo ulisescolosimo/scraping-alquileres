@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bed, Bath, DollarSign, Home, Ruler } from "lucide-react";
+import { Bed, Bath, DollarSign, Home, Ruler, HomeIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
