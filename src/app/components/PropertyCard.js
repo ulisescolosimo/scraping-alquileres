@@ -1,109 +1,93 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bed, Bath, DollarSign, Home, Ruler, HomeIcon } from "lucide-react";
+import { Bed, Bath, Ruler, MapPin, Calendar, Building2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function PropertyCard({ property }) {
-  // Función para obtener el símbolo de la moneda basado en price_currency
-  const getCurrencySymbol = (currency) => {
-    if (currency === "$") {
-      return "$"; // Signo de peso argentino
-    }
-    return "USD"; // Dólar
+  // Función para extraer números enteros de un texto
+  const extractInteger = (text) => {
+    const match = text?.match(/\d+/); // Busca el primer número entero en el texto
+    return match ? parseInt(match[0], 10) : 0; // Devuelve el número o 0 si no hay coincidencia
   };
 
-  // Función para obtener la imagen del badge según el sitio
-  const getSiteBadgeImage = (site) => {
-    if (site === "argenprop") {
-      return "/images/argenprop.jpg"; // Imagen de Argenprop
-    } else if (site === "zonaprop") {
-      return "/images/zonaprop.jpg"; // Imagen de Zonaprop
-    }
-    return "/placeholder.svg"; // Imagen por defecto
-  };
+  // Extraer valores numéricos de los campos
+  const priceAmount = extractInteger(property.price_amount); // Precio
+  const expensesAmount = extractInteger(property.expenses_amount); // Gastos
+  const bedrooms = extractInteger(property.dormitorios); // Habitaciones
+  const bathrooms = extractInteger(property.banos); // Baños
+  const area = extractInteger(property.superficie_cubierta); // Superficie cubierta
+  const age = extractInteger(property.antiguedad); // Antigüedad
 
-  // Convertir el precio a un número y formatearlo
-  const formattedPrice = parseFloat(property.price_amount).toLocaleString('es-AR');
+  // Formatear el precio con el símbolo de la moneda
+  const getCurrencySymbol = (currency) => (currency === "$" ? "$" : "USD");
+  const formattedPrice = priceAmount.toLocaleString("es-AR");
 
   return (
     <motion.div
-      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
-      whileHover={{ y: -5 }}
+      className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-2 duration-300 flex flex-col"
+      whileHover={{ scale: 1.02 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Imagen de la propiedad */}
       <div className="relative flex-shrink-0">
         <img
-          className="w-full h-64 object-cover"
+          className="w-full h-64 object-cover rounded-t-lg"
           src={property.fotos[0] || "/placeholder.svg"}
           alt={property.title}
         />
-        {/* Badge que muestra la imagen del sitio de origen */}
-        <div className="absolute top-2 left-2 m-2 w-12 h-12 rounded-full overflow-hidden border-2 border-white">
-          <img
-            className="w-full h-full object-cover"
-            src={getSiteBadgeImage(property.site)} // Usa la imagen en lugar de texto
-            alt={property.site}
-          />
-        </div>
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
-        <h2 className="font-bold text-xl mb-2 line-clamp-1">{property.title}</h2>
-        <p className="text-gray-600 text-sm line-clamp-2">{property.description || "Description not available"}</p>
+      {/* Contenido de la tarjeta */}
+      <div className="p-6 flex flex-col flex-grow space-y-4">
+        {/* Título y descripción */}
+        <h2 className="font-semibold text-xl text-gray-900 truncate">{property.title}</h2>
+        <p className="text-gray-500 text-sm truncate">{property.description || "Descripción no disponible"}</p>
 
         {/* Dirección */}
-        <div className="flex items-center justify-between space-x-2 mt-2">
-          <div className="flex items-center space-x-2">
-            <HomeIcon className="text-gray-400" size={20} />
-            <span className="text-gray-600 text-sm">{property.address}</span>
-          </div>
+        <div className="flex items-center space-x-2 text-gray-600 text-sm">
+          <MapPin size={18} className="text-gray-400" />
+          <span>{property.address}</span>
         </div>
 
         {/* Precio */}
-        <div className="text-center mt-4">
-          <p className="text-3xl font-bold text-primary flex items-center justify-center">
-            {getCurrencySymbol(property.price_currency)}{" "}
-            {formattedPrice}
+        <div className="text-center mt-2">
+          <p className="text-3xl font-bold text-blue-700">
+            {getCurrencySymbol(property.price_currency)} {formattedPrice}
           </p>
-          {property.expenses_amount > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
-              + ${property.expenses_amount.toLocaleString()} expenses
-            </p>
+          {expensesAmount > 0 && (
+            <p className="text-sm text-gray-500">+ ${expensesAmount.toLocaleString()} expensas</p>
           )}
         </div>
 
         {/* Detalles adicionales */}
-        <div className="flex justify-between text-sm text-gray-600 mt-4">
+        <div className="grid grid-cols-2 gap-4 text-gray-600 text-sm">
           <div className="flex items-center space-x-1">
-            <Bed size={16} />
-            <span>{property.dormitorios} Beds</span>
+            <Bed size={18} />
+            <span>{bedrooms} Habitaciones</span>
           </div>
           <div className="flex items-center space-x-1">
-            <Bath size={16} />
-            <span>{property.banos} Baths</span>
+            <Bath size={18} />
+            <span>{bathrooms} Baños</span>
           </div>
           <div className="flex items-center space-x-1">
-            <Ruler size={16} />
-            <span>{property.superficie_cubierta} m²</span>
+            <Ruler size={18} />
+            <span>{area} m²</span>
           </div>
-        </div>
-
-        {/* Antigüedad */}
-        <div className="text-sm text-gray-600 mt-2">
-          <span>Antiguedad: {property.antiguedad} years</span>
+          <div className="flex items-center space-x-1">
+            <Calendar size={18} />
+            <span>Antigüedad: {age} años</span>
+          </div>
         </div>
       </div>
 
       {/* Botón de ver detalles */}
       <div className="p-6 mt-auto">
         <Link href={`/properties/${property.id}`} passHref>
-          <Button className="w-full bg-cyan-800 text-white hover:text-black hover:border-solid-red" variant="default">
-            View Details
-          </Button>
+          <Button className="w-full rounded-xl bg-blue-700 text-white hover:bg-blue-900 transition">Ver Detalles</Button>
         </Link>
       </div>
     </motion.div>
